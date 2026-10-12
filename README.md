@@ -5,18 +5,63 @@ com autenticação JWT, filtros, paginação, relacionamentos e tratamento de er
 
 **Stack:** Python 3.10+ · FastAPI · SQLAlchemy 2 · SQLite (padrão) · PyJWT · pytest
 
-## Como rodar
+## Como rodar (Windows — CMD)
 
-```bash
-python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+**Pré-requisito:** Python 3.10 ou mais novo. Confira com `python --version`. Se não tiver, instale em
+python.org e marque **"Add python.exe to PATH"** na instalação.
 
-python seed.py                     # cria o banco e dados/usuários de demonstração
-uvicorn app.main:app --reload      # http://127.0.0.1:8000/docs
+Abra o **Prompt de Comando (CMD)** e siga na ordem:
+
+**1. Entre na pasta do projeto** (a que contém `requirements.txt` e `seed.py`):
+
+```bat
+cd C:\caminho\para\academico_api
 ```
 
-No Swagger (`/docs`): faça `POST /api/v1/auth/login`, copie o `token` e clique em **Authorize**.
+**2. Crie o ambiente virtual** (só na primeira vez):
+
+```bat
+python -m venv .venv
+```
+
+**3. Ative o ambiente virtual** (a cada novo CMD aberto):
+
+```bat
+.venv\Scripts\activate.bat
+```
+
+O prompt deve passar a começar com `(.venv)`. Se não aparecer, o ambiente não foi ativado.
+
+**4. Instale as dependências** (só na primeira vez):
+
+```bat
+python -m pip install -r requirements.txt
+```
+
+**5. Crie o banco e os dados de demonstração** (só na primeira vez):
+
+```bat
+python seed.py
+```
+
+Ele lista os usuários de demonstração (tabela abaixo).
+
+**6. Suba a API:**
+
+```bat
+python -m uvicorn app.main:app --reload
+```
+
+**7. Abra o Swagger no navegador:** http://127.0.0.1:8000/docs
+
+- Abra `POST /api/v1/auth/login`, clique em **Try it out** e envie
+  `{"email": "secretaria@faculdade.com.br", "senha": "123456"}`.
+- Copie o valor de `token` da resposta, clique em **Authorize** (cadeado) e cole o token.
+- Pronto: todos os endpoints passam a funcionar pelo Swagger.
+
+**8. Para parar a API:** `Ctrl+C` no CMD.
+
+**Nas próximas vezes** só são necessários os passos 1, 3 e 6.
 
 | Perfil | E-mail | Senha |
 |---|---|---|
@@ -27,10 +72,29 @@ No Swagger (`/docs`): faça `POST /api/v1/auth/login`, copie o `token` e clique 
 
 > Usuários de demonstração: **não use em produção**.
 
+### Problemas comuns
+
+| Problema | Solução |
+|---|---|
+| `No module named 'sqlalchemy'` (ou outro módulo) | O ambiente virtual não está ativo, ou o `pip` instalou em outro Python. Ative com `.venv\Scripts\activate.bat` (confira o `(.venv)` no prompt) e instale com `python -m pip install -r requirements.txt`. |
+| `Activate.ps1` não funciona no CMD | Esse arquivo é só do PowerShell. No CMD use `.venv\Scripts\activate.bat`. |
+| `'python' não é reconhecido` | Tente `py` no lugar de `python` (ex.: `py -m venv .venv`). Ou reinstale o Python marcando "Add python.exe to PATH". |
+| Porta 8000 em uso | Use outra porta: `python -m uvicorn app.main:app --reload --port 8001` (e abra `http://127.0.0.1:8001/docs`). |
+| Quero zerar o banco | Pare a API, rode `del academico.db` e depois `python seed.py` de novo. |
+| `401 TOKEN_INVALIDO` no Swagger | O token expirou (2 h) ou você fez logout. Faça login de novo e cole o novo token em **Authorize**. |
+
+### PowerShell, Linux e Mac
+
+- **PowerShell:** use `.venv\Scripts\Activate.ps1` no passo 3. Se aparecer "execução de scripts desabilitada",
+  rode `Set-ExecutionPolicy -Scope Process Bypass` e tente de novo.
+- **Linux/Mac:** use `python3` no lugar de `python` e `source .venv/bin/activate` no passo 3.
+
 ## Testes
 
-```bash
-pytest -q
+Com o ambiente virtual ativo:
+
+```bat
+python -m pytest -q
 ```
 
 ## Estrutura
